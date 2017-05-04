@@ -1,0 +1,4 @@
+pn p1 at 0 bt 7
+pn p2 at 1 bt 4
+pn p3 at 5 bt 9
+pn p4 at 3 bt 9

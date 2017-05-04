@@ -1,0 +1,6 @@
+pn p1 at 0 bt 11 tq 3 cb 7 ib 5 
+pn p2 at 2 bt 4 tq 3 cb 0 ib 0
+pn p3 at 3 bt 7 tq 3 cb 4 ib 6
+pn p4 at 4 bt 1 tq 3 cb 0 ib 5
+
+6
