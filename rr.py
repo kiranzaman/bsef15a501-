@@ -1,156 +1,167 @@
-import time
+mport time
+#function to read data from the file 
 def data_read():
 	f=open('file1.txt')
+	#read data separated by white space 
 	line=f.readline().split()
 	while line:
-		d={}
-		d[line[-12]]=line[-11]
-		d[line[-10]]=line[-9]
-		d[line[-8]]=line[-7]
-		d[line[-6]]=line[-5]
-		d[line[-4]]=line[-3]
-		d[line[-2]]=line[-1]
-		di.append(d)
+		#dictionary to store data i.e., process number arrival time and burst time 
+		dictionary = {}
+		dictionary[line[-12]]=line[-11]
+		dictionary[line[-10]]=line[-9]
+		dictionary[line[-8]]=line[-7]
+		dictionary[line[-6]]=line[-5]
+		dictionary[line[-4]]=line[-3]
+		dictionary[line[-2]]=line[-1]
+		dict.append(dictionary)
 		line=f.readline().split()
 	f.close()
-def inWaitingq(pname):
-	for i in range(0,len(wq)):
-		if(wq[i]["pn"] == pname) :
+#function to find if there is some process in the waiting queue 
+def inWaitingqueue(pname):
+	#traverse whole waiting queue and see if the perticular process exists 
+	for i in range(0,len(wait_queue)):
+		if(wait_queue[i]["pn"] == pname) :
 			return True
 	return False
-def inreadyq(pname):
-	for i in range(0,len(rq)):
-		if(rq[i]["pn"] == pname) :
+#function to see if any process is in ready queue 
+def inreadyqueue(pname):
+#traverse the ready queue and see if the process exists 
+	for i in range(0,len(ready_queue)):
+		if(ready_queue[i]["pn"] == pname) :
 			return True
 	return False
+#function to find the process with minimum of the return time from the waiting list after the io burst 
 def find_min() :
-	minv = int(wli[0]["rt"])
-	ind = 0
-	for n in range(0,len(wli)):
-		if int(wli[n]["rt"]) < minv:
-			minv = int(wli[n]["rt"])
-			ind = n
-	return ind	
-def update_readyq(check):
+	minv = int(waiting_list[0]["return_time"])
+	new_process = 0
+	for n in range(0,len(waiting_list)):
+		if int(waiting_list[n]["return_time"]) < minv:
+			minv = int(waiting_list[n]["return_time"])
+			new_process = n
+	return new_process	
+#function to update the ready queue with respect to to arrival time of the processes, their burst time, time quantum, io bursts 
+def update_ready_queue(check):
 	j=0
-	d = {'ext':0,'et':0,'iot':0}
+	dictionary = {'execution_time':0,'ending_time':0,'iotime':0}
+	#loop for the total no of processes 
 	for i in range(0,len(q)):
-		if int(q[i]["bt"]) > 0 and inWaitingq(q[i]["pn"]) == False and int(q[i]["at"]) <= current_time and inreadyq(q[i]["pn"]) == False :
-			rq.append(q[i])
-			d["ext"] = q[i]["tq"]
-			if int(q[i]["cb"]) == 0 :
-				d["iot"] = "in"
+		#condition to check if burst time is greater than zero and no process is coming from waiting queue or ready queue 
+		if int(q[i]["bt"]) > 0 and inWaitingqueue(q[i]["pn"]) == False and int(q[i]["at"]) <= current_time and inreadyqueue(q[i]["pn"]) == False :
+			#then update the ready queue 
+			ready_queue.append(q[i])
+			#process will be executed as much it has time quantum
+			dictionary["execution_time"] = q[i]["time_quantum"]
+			#if the current burst is to be stopped and the process has to go for input/output 
+			if int(q[i]["current_burst"]) == 0 :
+				dictionary["iotime"] = "in"
 			else:
-				d["iot"] = q[i]["cb"]
-			if q[i]["bt"] < q[i]["tq"] :
-				d["et"] = q[i]["bt"]
-			elif int(q[i]["cb"]) == 0 :
-				d["et"] = q[i]["tq"]
-			elif  q[i]["bt"] >= q[i]["tq"] and q[i]["cb"] <= q[i]["tq"] and q[i]["cb"] != '0' :
-				d["et"] = q[i]["cb"]
+				dictionary["iotime"] = q[i]["current_burst"]
+			#if burst time is the quantum time then it will be its ending time and terminated 
+			if q[i]["bt"] < q[i]["time_quantum"] :
+				dictionary["ending_time"] = q[i]["bt"]
+			elif int(q[i]["current_burst"]) == 0 :
+				dictionary["ending_time"] = q[i]["time_quantum"]
+			elif  q[i]["bt"] >= q[i]["time_quantum"] and q[i]["current_burst"] <= q[i]["time_quantum"] and q[i]["current_burst"] != '0' :
+				dictionary["ending_time"] = q[i]["current_burst"]
 			else :
-				d["et"] = q[i]["tq"]
-			li.append(d)
-		#print li
-	d = {'ext':0,'et':0,'iot':0}
-	for j in range(0,len(wli)) :
+				dictionary["ending_time"] = q[i]["time_quantum"]
+			list.append(dictionary)
+	dictionary = {'execution_time':0,'ending_time':0,'iotime':0}
+	for j in range(0,len(waiting_list)) :
 		val = find_min()
-		if wli[val]["rt"] <= current_time :
-			d["ext"] = wli[val]["ext"]
-			d["iot"] = wq[val]["cb"]
-			if wli[val]["ext"] < wq[val]["cb"] :
-				d["et"] = wli[val]["ext"]
+		if waiting_list[val]["return_time"] <= current_time :
+			dictionary["execution_time"] = waiting_list[val]["execution_time"]
+			dictionary["iotime"] = wait_queue[val]["current_burst"]
+			if waiting_list[val]["execution_time"] < wait_queue[val]["current_burst"] :
+				d["ending_time"] = waiting_list[val]["execution_time"]
 			else :
-				d["et"] = wq[val]["cb"]
-			#lrt.append(wli[val]["rt"])
-			li.append(d)
-			rq.append(wq[val])
-			print wq[val]["pn"], " is now returning from waiting queue at ", wli[val]["rt"]
-			del wq[val]
-			del wli[val]
+				d["ending_time"] = wait_queue[val]["current_burst"]
+			list.append(dictionary)
+			ready_queue.append(wait_queue[val])
+			print wait_queue[val]["pn"], " is now returning from waiting queue at ", waiting_list[val]["return_time"]
+			del wait_queue[val]
+			del waiting_list[val]
 	if check == True :
-		rq.append(rq[0])
-		li.append(li[0])
-		del rq[0]
-		del li[0]
-	#print li[0]		
-def update_waitingq():
-	wq.append(rq[0])
-	d = {'pn':0,'rt':0,'ext':0}
-	d["rt"] = int(rq[0]["ib"])+current_time
-	d["ext"] = li[0]["ext"]
-	wli.append(d)
+		ready_queue.append(ready_queue[0])
+		list.append(li[0])
+		del ready_queue[0]
+		del list[0]	
+#function to update waiting queue 		
+def update_waiting_queue():
+	wait_queue.append(ready_queue[0])
+	dictionary = {'pn':0,'return_time':0,'execution_time':0}
+	dictionary["return_time"] = int(ready_queue[0]["ioburst"])+current_time
+	dictionary["execution_time"] = list[0]["execution_time"]
+	waiting_list.append(dictionary)
+	#function to print process no and turn around time 
 def printfun() :
-	print "process name	turn around time"
-	for a in range (0,len(q)) :
-		print output[a]["pn"],"	  	    ",output[a]["ta"]
+	print "process name\tturn around time"
+	for number in range (0,len(q)) :
+		print output[number]["pn"],"	  	    ",output[number]["turn_around"]
+#main function 
 if __name__ == "__main__" :
-	di = []
+	dict = []
 	q = []
-	rq = []
-	li = []
-	wq = []
-	wli = []
+	ready_queue = []
+	list = []
+	wait_queue = []
+	waiting_list = []
 	chk = True
 	current_time = 0
 	output = []
 	data_read()
-	print di
-	#print len(di)
+	print dict
+	#sort with respect to the process' arrival time 
 	q = sorted(di, key = lambda k: int(k["at"]))
-	update_readyq(False)
+	update_ready_queue(False)
 	count = 0
 	while count != len(q) :
-		if len(rq) != 0 :
-			if li[0]["et"] != '0' :
-				print rq[0]["pn"], " execution started for ",li[0]["et"], "sec at time ", current_time
+		if len(ready_queue) != 0 :
+			if list[0]["ending_time"] != '0' :
+				print ready_queue[0]["pn"], " execution started for ",list[0]["ending_time"], "sec at time ", current_time
 			var = 0
-			while var != int(li[0]["et"]) :
+			while var != int(li[0]["ending_time"]) :
 				current_time = current_time +1
 				update_readyq(False)
 				var = var+1
-			li[0]["ext"] = str(int(li[0]["ext"])-int(li[0]["et"]))
+			list[0]["execution_time"] = str(int(list[0]["execution_time"])-int(list[0]["ending_time"]))
 			
-			if int(li[0]["ext"]) == 0 and li[0]["iot"] > '0' :	
-				li[0]["ext"] = rq[0]["tq"]
-			if li[0]["iot"] != 'in':
-				#print li[0]["iot"], li[0]["et"]
-				li[0]["iot"] = str(int(li[0]["iot"])-int(li[0]["et"]))
-			rq[0]["bt"] = str(int(rq[0]["bt"])-int(li[0]["et"]))
-			if li[0]["iot"] <= li[0]["ext"] and li[0]["iot"] != "in" :
-				li[0]["et"] = li[0]["iot"]
-			elif li[0]["ext"] <= rq[0]["cb"] :
-				li[0]["et"] = li[0]["ext"]
-			elif rq[0]["bt"] <= li[0]["ext"] :
-				li[0]["et"] = rq[0]["bt"]
+			if int(list[0]["execution_time"]) == 0 and list[0]["iotime"] > '0' :	
+				list[0]["execution_time"] = ready_queue[0]["time_quantum"]
+			if list[0]["iotime"] != 'in':
+				list[0]["iotime"] = str(int(list[0]["iotime"])-int(list[0]["ending_time"]))
+			ready_queue[0]["bt"] = str(int(ready_queue[0]["bt"])-int(list[0]["ending_time"]))
+			if list[0]["iotime"] <= list[0]["execution_time"] and list[0]["iotime"] != "in" :
+				list[0]["ending_time"] = list[0]["iotime"]
+			elif list[0]["execution_time"] <= ready_queue[0]["current_burst"] :
+				list[0]["ending_time"] = list[0]["execution_time"]
+			elif ready_queue[0]["bt"] <= list[0]["execution_time"] :
+				list[0]["ending_time"] = ready_queue[0]["bt"]
 			else :
-				li[0]["et"] = rq[0]["cb"]
+				list[0]["ending_time"] = ready_queue[0]["current_burst"]
 			chk =  True
-			#print rq
-			#print li[0]
-			if int(rq[0]["cb"]) != 0 and int(rq[0]["bt"]) > 0 and li[0]["iot"] == '0' :
-				print rq[0]["pn"], " going to waiting queue for ", rq[0]["ib"], "sec at time ", current_time
+			
+			if int(ready_queue[0]["current_burst"]) != 0 and int(ready_queue[0]["bt"]) > 0 and list[0]["iotime"] == '0' :
+				print ready_queue[0]["pn"], " going to waiting queue for ", ready_queue[0]["ioburst"], "sec at time ", current_time
 				chk = False
 				update_waitingq()
-				del rq[0]
-				del li[0]
-			if chk == True and int(rq[0]["bt"]) <= 0 :
-				print rq[0]["pn"], "execution completed" 
-				out_dic = {'pn':0,'ta':0}
-				out_dic['ta'] = (current_time-int(rq[0]["at"]))
-				out_dic['pn'] = rq[0]["pn"]
+				del ready_queue[0]
+				del list[0]
+			if chk == True and int(ready_queue[0]["bt"]) <= 0 :
+				print ready_queue[0]["pn"], "execution completed" 
+				out_dic = {'pn':0,'turn_around':0}
+				out_dic['turn_around'] = (current_time-int(ready_queue[0]["at"]))
+				out_dic['pn'] = ready_queue[0]["pn"]
 				output.append(out_dic)
 				count = count + 1
-				del rq[0]
-				del li[0]
+				del ready_queue[0]
+				del list[0]
 				chk =  False
-			update_readyq(chk)
-			while len(rq) == 0 and len(q) != count :
-				#print "check:",f
+			update_ready_queue(chk)
+			while len(ready_queue) == 0 and len(q) != count :
 				current_time=current_time+1
-				update_readyq(False)
-		while len(rq) == 0 and len(q) != count :
-				#print "check:",f
-				update_readyq(False)
+				update_ready_queue(False)
+		while len(ready_queue) == 0 and len(q) != count :
+				update_ready_queue(False)
 				current_time=current_time+1
 	printfun()
