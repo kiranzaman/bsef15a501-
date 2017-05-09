@@ -1,54 +1,65 @@
 import time
+#function to read data from the file 
 def data_read():
-	c1=0
+	total_process=0
+	#read data separated by white space 
 	line=f.readline().split()
 	while line:
-		c1=c1+1	
-		dict = {}
-		dict[line[-6]]=line[-5]
-		dict[line[-4]]=line[-3]
-		dict[line[-2]]=line[-1]
-		di.append(d)
+		total_process=total_process+1	
+		#dictionary to store data i.e., process number arrival time and burst time 
+		dictionary = {}
+		dictionary[line[-6]]=line[-5]
+		dictionary[line[-4]]=line[-3]
+		dictionary[line[-2]]=line[-1]
+		dict.append(dictionary)
 		line=f.readline().split()
-	return c1
-
+	f.close()
+	#returns the count of total number of process 
+	return total_process
+#function to print the output 
 def print_func():
-	v=0
-	print "Process   Turn Around Time   Waiting Time"
-	while v<count:
-		print process[v],"		",turn_arround[v],"		", wait_time[v]
-		v=v+1
-
+	numberOfProcesses=0
+	print "process   turn around time   waiting time"
+	#loop till total number of processes 
+	while numberOfProcesses<count:
+		print process[numberOfProcesses],"		",turn_around[numberOfProcesses],"		", wait[numberOfProcesses]
+		numberOfProcesses=numberOfProcesses+1
+#main function 
 if __name__ == "__main__" :
+	#read from file 
 	f=open('file.txt')
 	i=0
 	t=0
-	st=0
-	j=0
+	waiting_time=0
+	burst_time=0
 	k=0
 	count =0
-	di=[]
+	dict =[]
 	process = []
+	#count is for count of total number of processses 
 	count=data_read()
 	turn_around = []
-	wait_time = []
-	nlist=sorted(di, key = lambda k: k['at'])	
+	wait = []
+	#using sort function and sorting the processes with respect to arrival time as the process with the smaller arrival time willl be served first(FCFS)
+	nlist=sorted(dict, key = lambda k: k['at'])	
+	#loop  for total number of processes 
 	while i<count:
 
-		print di[i]["pn"] ,"Execution Started"
-		j=int(di[i]["bt"])
-		print di[i]["pn"] ," is going to execute for ", j, "seconds"
-		while j>0:
+		print dict[i]["pn"] ,"execution started"
+		burst_time=int(dict[i]["bt"])
+		print dict[i]["pn"] ," going to execute for ", burst_time, "seconds"
+		#for the completion of burst time , it won't be stopped as its non-premptive 
+		while burst_time>0:
 			time.sleep(1)
-			j=j-1
+			burst_time=burst_time-1
 			t=t+1
-		"""while k<i :
-			t=t+int(di[k]["bt"])
-			k=k+1"""
-		print(di[i]["pn"]), "execution completed."
-		turn_ar.append((st+int(di[i]["bt"]))-int(di[i]["at"]))
-		wait.append((st-int(di[i]["at"])))
-		proc.append(di[i]["pn"])
+		print(dict[i]["pn"]), "execution completed"
+		#turnaround time = finish time - arrival time 
+		#finish time = waiting time + burst time 
+		turn_around.append((waiting_time+int(dict[i]["bt"]))-int(dict[i]["at"]))
+		wait.append((waiting_time-int(dict[i]["at"])))
+		process.append(dict[i]["pn"])
 		i=i+1
-		st=t
+		#waiting time updated 
+		waiting_time=t
 	print_func()
