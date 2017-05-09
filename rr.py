@@ -1,4 +1,4 @@
-mport time
+import time
 #function to read data from the file 
 def data_read():
 	f=open('file1.txt')
