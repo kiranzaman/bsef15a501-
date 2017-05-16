@@ -25,11 +25,11 @@ def print_func():
 		print process[numberOfProcesses],"		",turn_around[numberOfProcesses],"		", wait[numberOfProcesses]
 		numberOfProcesses=numberOfProcesses+1
 #main function 
-if __name__ == "__main__" :
+if __ name __ == "__main__" :
 	#read from file 
 	f=open('file.txt')
 	i=0
-	t=0
+	time1=0
 	waiting_time=0
 	burst_time=0
 	k=0
@@ -52,7 +52,7 @@ if __name__ == "__main__" :
 		while burst_time>0:
 			time.sleep(1)
 			burst_time=burst_time-1
-			t=t+1
+			time1=time1+1
 		print(dict[i]["pn"]), "execution completed"
 		#turnaround time = finish time - arrival time 
 		#finish time = waiting time + burst time 
@@ -61,5 +61,5 @@ if __name__ == "__main__" :
 		process.append(dict[i]["pn"])
 		i=i+1
 		#waiting time updated 
-		waiting_time=t
+		waiting_time=time1
 	print_func()
