@@ -13,7 +13,7 @@ def data_read():
 		dictionary[line[-6]]=line[-5]
 		dictionary[line[-4]]=line[-3]
 		dictionary[line[-2]]=line[-1]
-		dict.append(dictionary)
+		dictionary1.append(dictionary)
 		line=f.readline().split()
 	f.close()
 #function to find if there is some process in the waiting queue 
@@ -40,52 +40,52 @@ def find_min() :
 			new_process = n
 	return new_process	
 #function to update the ready queue with respect to to arrival time of the processes, their burst time, time quantum, io bursts 
-def update_ready_queue(check):
+def update_ready_queue(checktoupdatereadyqueue):
 	j=0
 	dictionary = {'execution_time':0,'ending_time':0,'iotime':0}
 	#loop for the total no of processes 
-	for i in range(0,len(q)):
+	for i in range(0,len(queue)):
 		#condition to check if burst time is greater than zero and no process is coming from waiting queue or ready queue 
-		if int(q[i]["bt"]) > 0 and inWaitingqueue(q[i]["pn"]) == False and int(q[i]["at"]) <= current_time and inreadyqueue(q[i]["pn"]) == False :
+		if int(queue[i]["bt"]) > 0 and inWaitingqueue(queue[i]["pn"]) == False and int(q[i]["at"]) <= current_time and inreadyqueue(q[i]["pn"]) == False :
 			#then update the ready queue 
-			ready_queue.append(q[i])
+			ready_queue.append(queue[i])
 			#process will be executed as much it has time quantum
-			dictionary["execution_time"] = q[i]["time_quantum"]
+			dictionary["execution_time"] = queue[i]["time_quantum"]
 			#if the current burst is to be stopped and the process has to go for input/output 
-			if int(q[i]["current_burst"]) == 0 :
+			if int(queue[i]["current_burst"]) == 0 :
 				dictionary["iotime"] = "in"
 			else:
-				dictionary["iotime"] = q[i]["current_burst"]
+				dictionary["iotime"] = queue[i]["current_burst"]
 			#if burst time is the quantum time then it will be its ending time and terminated 
-			if q[i]["bt"] < q[i]["time_quantum"] :
-				dictionary["ending_time"] = q[i]["bt"]
-			elif int(q[i]["current_burst"]) == 0 :
-				dictionary["ending_time"] = q[i]["time_quantum"]
-			elif  q[i]["bt"] >= q[i]["time_quantum"] and q[i]["current_burst"] <= q[i]["time_quantum"] and q[i]["current_burst"] != '0' :
-				dictionary["ending_time"] = q[i]["current_burst"]
+			if queue[i]["bt"] < queue[i]["time_quantum"] :
+				dictionary["ending_time"] = queue[i]["bt"]
+			elif int(queue[i]["current_burst"]) == 0 :
+				dictionary["ending_time"] = queue[i]["time_quantum"]
+			elif  queue[i]["bt"] >= queue[i]["time_quantum"] and queue[i]["current_burst"] <= queue[i]["time_quantum"] and queue[i]["current_burst"] != '0' :
+				dictionary["ending_time"] = queue[i]["current_burst"]
 			else :
-				dictionary["ending_time"] = q[i]["time_quantum"]
-			list.append(dictionary)
+				dictionary["ending_time"] = queue[i]["time_quantum"]
+			list_time.append(dictionary)
 	dictionary = {'execution_time':0,'ending_time':0,'iotime':0}
 	for j in range(0,len(waiting_list)) :
-		val = find_min()
-		if waiting_list[val]["return_time"] <= current_time :
-			dictionary["execution_time"] = waiting_list[val]["execution_time"]
-			dictionary["iotime"] = wait_queue[val]["current_burst"]
-			if waiting_list[val]["execution_time"] < wait_queue[val]["current_burst"] :
-				d["ending_time"] = waiting_list[val]["execution_time"]
+		processfromwaitinglist = find_min()
+		if waiting_list[processfromwaitinglist]["return_time"] <= current_time :
+			dictionary["execution_time"] = waiting_list[processfromwaitinglist]["execution_time"]
+			dictionary["iotime"] = wait_queue[processfromwaitinglist]["current_burst"]
+			if waiting_list[processfromwaitinglist]["execution_time"] < wait_queue[processfromwaitinglist]["current_burst"] :
+				dictionary["ending_time"] = waiting_list[processfromwaitinglist]["execution_time"]
 			else :
-				d["ending_time"] = wait_queue[val]["current_burst"]
-			list.append(dictionary)
-			ready_queue.append(wait_queue[val])
-			print wait_queue[val]["pn"], " is now returning from waiting queue at ", waiting_list[val]["return_time"]
-			del wait_queue[val]
-			del waiting_list[val]
-	if check == True :
+				dictionary["ending_time"] = wait_queue[processfromwaitinglist]["current_burst"]
+			list_time.append(dictionary)
+			ready_queue.append(wait_queue[processfromwaitinglist])
+			print wait_queue[processfromwaitinglist]["pn"], " is now returning from waiting queue at ", waiting_list[processfromwaitinglist]["return_time"]
+			del wait_queue[processfromwaitinglist]
+			del waiting_list[processfromwaitinglist]
+	if checktoupdatereadyqueue == True :
 		ready_queue.append(ready_queue[0])
-		list.append(li[0])
+		list_time.append(li[0])
 		del ready_queue[0]
-		del list[0]
+		del list_time[0]
 #function to update waiting queue 		
 def update_waiting_queue():
 	wait_queue.append(ready_queue[0])
@@ -110,7 +110,7 @@ def update_auxilary_queue(current_time, count) :
 				print ready_queue[0]["pn"], "execution completed" 
 				out_dic = {'pn':0,'turn_around':0}
 				out_dic['turn_around'] = (current_time-int(ready_queue[0]["at"]))
-				out_dic['pn'] = aq[0]["pn"]
+				out_dic['pn'] = auxiliary_queue[0]["pn"]
 				output.append(out_dic)
 				count = count + 1
 				checkexecution =  False
@@ -123,29 +123,48 @@ def update_auxilary_queue(current_time, count) :
 				del auxiliary_queue[0]
 				del auxiliary_list[0]
 			else :
-				d1= {'execution_time':0,'ending_time':0,'iotime':0}
+				dictionary2= {'execution_time':0,'ending_time':0,'iotime':0}
 				ready_queue.append(auxiliary_queue[0])
-				d1["execution_time"] = auxiliary_queue[0]["time_quantum"]
+				dictionary2["execution_time"] = auxiliary_queue[0]["time_quantum"]
 				if int(auxiliary_queue[0]["current_burst"]) == 0 :
-					d1["iotime"] = "in"
+					dictionary2["iotime"] = "in"
 				else:
-					d1["iotime"] = auxiliary_queue[0]["current_burst"]
+					dictionary2["iotime"] = auxiliary_queue[0]["current_burst"]
 				if auxiliary_queue[0]["bt"] < auxiliary_queue[0]["time_quantum"] :
-					d1["ending_time"] = auxiliary_queue[0]["bt"]
+					dictionary2["ending_time"] = auxiliary_queue[0]["bt"]
 				elif int(auxiliary_queue[0]["current_burst"]) == 0 :
-					d1["ending_time"] = auxiliary_queue[0]["time_quantum"]
+					dictionary2["ending_time"] = auxiliary_queue[0]["time_quantum"]
 				elif  auxiliary_queue[0]["bt"] >= auxiliary_queue[0]["time_quantum"] and auxiliary_queue[0]["current_burst"] <= auxiliary_queue[0]["time_quantum"] and auxiliary_queue[0]["current_burst"] != '0' :
-					d1["ending_time"] = auxiliary_queue[0]["current_burst"]
+					dictionary2["ending_time"] = auxiliary_queue[0]["current_burst"]
 				else :
-					d1["ending_time"] = auxiliary_queue[0]["time_quantum"]
+					dictionary2["ending_time"] = auxiliary_queue[0]["time_quantum"]
 				del auxiliary_queue[0]
 				del auxiliary_list[0]
-				list.append(d1)
-			current_time = update_auxilaryq(current_time,count)
+				list_time.append(d1)
+			current_time = update_auxilary_queue(current_time,count)
 			update_ready_queue(checkexecution)
 	return current_time
 #function to print process no and turn around time 
 def printfun() :
 	print "process name\tturn around time"
-	for number in range (0,len(q)) :
+	for number in range (0,len(queue)) :
 		print output[number]["pn"],"	  	    ",output[number]["turn_around"]
+#main function 
+if __name__ == "__main__" :
+	dictionary1 = []
+	queue = []
+	ready_queue = []
+	list_time = []
+	wait_queue = []
+	waiting_list = []
+	auxiliary_list = []
+	auxiliary_queue= []	
+	check_process_execution = True
+	current_time = 0
+	output = []
+	data_read()
+	print dictionary1
+	#print len(di)
+	queue = sorted(di, key = lambda k: int(k["at"]))
+	update_ready_queue(False)
+	count = 0
